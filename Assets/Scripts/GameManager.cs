@@ -110,6 +110,9 @@ private void InitialSetup()
 public void AddPiece(GameObject prefab, Player player, int col, int row)
 {
         GameObject pieceObject = board.AddPiece(prefab, col, row);
+        Rigidbody goRigidBody = pieceObject.AddComponent<Rigidbody>(); //
+        goRigidBody.mass = 5;
+        goRigidBody.useGravity  = false;
         player.pieces.Add(pieceObject);
         pieces[col, row] = pieceObject;
 }
