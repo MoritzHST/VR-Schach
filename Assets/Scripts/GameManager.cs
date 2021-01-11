@@ -51,6 +51,8 @@ public GameObject blackKnight;
 public GameObject blackRook;
 public GameObject blackPawn;
 
+public PhysicMaterial physicMaterial;
+
 private GameObject[,] pieces;
 
 private Player white;
@@ -110,9 +112,6 @@ private void InitialSetup()
 public void AddPiece(GameObject prefab, Player player, int col, int row)
 {
         GameObject pieceObject = board.AddPiece(prefab, col, row);
-        Rigidbody goRigidBody = pieceObject.AddComponent<Rigidbody>(); //
-        goRigidBody.mass = 5;
-        goRigidBody.useGravity  = false;
         player.pieces.Add(pieceObject);
         pieces[col, row] = pieceObject;
 }
@@ -218,13 +217,14 @@ public void CapturePieceAt(Vector2Int gridPoint)
         GameObject pieceToCapture = PieceAtGrid(gridPoint);
         currentPlayer.capturedPieces.Add(pieceToCapture);
         pieces[gridPoint.x, gridPoint.y] = null;
+
         if (pieceToCapture.GetComponent<Piece>().type == PieceType.King)
         {
                 Debug.Log(currentPlayer.name + " wins!");
                 Destroy(board.GetComponent<TileSelector>());
                 Destroy(board.GetComponent<MoveSelector>());
         }
-        Destroy(pieceToCapture);
+        //Destroy(pieceToCapture);
 }
 
 }
