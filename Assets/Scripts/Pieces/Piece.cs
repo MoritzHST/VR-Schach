@@ -48,15 +48,21 @@ public abstract class Piece : MonoBehaviour
     private Rigidbody body;
     private BoxCollider boxCollider;
 
+    public Vector3 initialCollisionPosition;
+
+    public bool collisionReady = false;
+
     protected void Start()
     {
         GameObject piece = this.gameObject;
 
         body = piece.AddComponent<Rigidbody>();
-        body.drag = 1;
+
         body.constraints = RigidbodyConstraints.FreezePositionY;
+        body.drag = 0;
 
         boxCollider = piece.AddComponent<BoxCollider>();
+        boxCollider.enabled = false;
 
         if (PieceType.King.Equals(type) || PieceType.Queen.Equals(type))
         {
@@ -82,26 +88,33 @@ public abstract class Piece : MonoBehaviour
     {
         GameObject obstacle = collision.gameObject;
         GameManager gm = GameManager.instance;
-        if ((!gm.DoesPieceBelongToCurrentPlayer(obstacle)) || obstacle.GetComponent<Piece>() == null)
-        {
-            Physics.IgnoreCollision(collision.collider, boxCollider);
-
-            if(obstacle.GetComponent<Piece>() != null && !gm.GridForPiece(obstacle).Equals(gm.GridForPiece(this.gameObject)))
-            {
-                Rigidbody rb = obstacle.GetComponent<Piece>().GetComponent<Rigidbody>();
-                rb.velocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-            }
+        Piece obstaclePiece = obstacle.GetComponent<Piece>();
+        if (obstaclePiece != null){
+          initialCollisionPosition = transform.position;
+          initialCollisionPosition.y = 0;
+          collisionReady = true;
         }
-        else if (obstacle.GetComponent<Piece>() != null){
-          this.moving = true;
-        }
+        /*if (gm.GridForPiece(this.gameObject).Equals(new Vector2Int(-1, -1))){
+          initialCollisionPosition = obstacle.transform.position;
+        }*/
     }
 
-    private void FixedUpdate(){
+    private void OnCollisionExit(Collision collision){
+      initialCollisionPosition = new Vector3(0,0,0);
+    }
+
+    private void FixedUpdate()
+    {
       GameManager gm = GameManager.instance;
-      if (this.moving && gm.GridForPiece(this.gameObject).Equals(new Vector2Int(-1, -1)) && body.velocity.magnitude < 0.01 ){
-          Destroy(this.gameObject);
+      if (this.gameObject != null && new Vector2Int(-1, -1).Equals(gm.GridForPiece(this.gameObject))){
+        Vector3 curPos = transform.position;
+        curPos.y = 0;
+        if (curPos != null && collisionReady){
+          if (Mathf.Abs(Vector3.Distance(curPos, initialCollisionPosition)) > 1){
+            Destroy(this.gameObject);
+          }
+        }
       }
     }
+
 }

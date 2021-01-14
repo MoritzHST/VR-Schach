@@ -215,6 +215,8 @@ public void NextPlayer()
 public void CapturePieceAt(Vector2Int gridPoint)
 {
         GameObject pieceToCapture = PieceAtGrid(gridPoint);
+        BoxCollider collider  = pieceToCapture.GetComponent<BoxCollider>();
+        collider.enabled = true;
         currentPlayer.capturedPieces.Add(pieceToCapture);
         pieces[gridPoint.x, gridPoint.y] = null;
 
